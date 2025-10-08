@@ -28,6 +28,7 @@ class ScaffoldWithSidebar extends StatefulWidget {
 
 class _ScaffoldWithSidebarState extends State<ScaffoldWithSidebar> {
   int _selectedIndex = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final _items = const [
     _NavItem(icon: Icons.home, label: 'Home'),
@@ -42,6 +43,7 @@ class _ScaffoldWithSidebarState extends State<ScaffoldWithSidebar> {
         final bool isLarge = constraints.maxWidth >= 800;
 
         return Scaffold(
+          key: _scaffoldKey,
           drawer: isLarge ? null : Drawer(child: _buildSidebar()),
           body: Row(
             children: [
@@ -49,6 +51,22 @@ class _ScaffoldWithSidebarState extends State<ScaffoldWithSidebar> {
               Expanded(child: _buildContent()),
             ],
           ),
+          bottomNavigationBar: isLarge
+              ? null
+              : BottomNavigationBar(
+                  items: _items
+                      .map((it) => BottomNavigationBarItem(icon: Icon(it.icon), label: it.label))
+                      .toList(),
+                  currentIndex: _selectedIndex,
+                  onTap: (index) {
+                    setState(() => _selectedIndex = index);
+                    // close drawer on selection if open (mobile)
+                    if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+                      final scaffoldCtx = _scaffoldKey.currentContext;
+                      if (scaffoldCtx != null) Navigator.of(scaffoldCtx).pop();
+                    }
+                  },
+                ),
         );
       },
     );
