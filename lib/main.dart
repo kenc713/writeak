@@ -44,29 +44,56 @@ class _ScaffoldWithSidebarState extends State<ScaffoldWithSidebar> {
 
         return Scaffold(
           key: _scaffoldKey,
+
+          // PCモバイル共通ヘッダーの表示
+          appBar: AppBar(
+
+            // タイトルの設定
+            title: const Text('Writeak'),
+            titleTextStyle: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 32,
+            ),
+            backgroundColor: Colors.blue,
+
+            // モバイル時のみメニューボタンを表示
+            leading: isLarge
+                ? null
+                : IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                  ),
+          ),
+
+          // サイドバーの表示
           drawer: isLarge ? null : Drawer(child: _buildSidebar()),
+          
+          // コンテンツの表示
           body: Row(
             children: [
               if (isLarge) SizedBox(width: 240, child: _buildSidebar()),
               Expanded(child: _buildContent()),
             ],
           ),
+
+          // モバイル用ボトムバーの表示
           bottomNavigationBar: isLarge
-              ? null
-              : BottomNavigationBar(
-                  items: _items
-                      .map((it) => BottomNavigationBarItem(icon: Icon(it.icon), label: it.label))
-                      .toList(),
-                  currentIndex: _selectedIndex,
-                  onTap: (index) {
-                    setState(() => _selectedIndex = index);
-                    // close drawer on selection if open (mobile)
-                    if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
-                      final scaffoldCtx = _scaffoldKey.currentContext;
-                      if (scaffoldCtx != null) Navigator.of(scaffoldCtx).pop();
-                    }
-                  },
-                ),
+            ? null
+            : BottomNavigationBar(
+                items: _items
+                    .map((it) => BottomNavigationBarItem(icon: Icon(it.icon), label: it.label))
+                    .toList(),
+                currentIndex: _selectedIndex,
+                onTap: (index) {
+                  setState(() => _selectedIndex = index);
+                  // close drawer on selection if open (mobile)
+                  if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+                    final scaffoldCtx = _scaffoldKey.currentContext;
+                    if (scaffoldCtx != null) Navigator.of(scaffoldCtx).pop();
+                  }
+                },
+              ),
         );
       },
     );
@@ -77,14 +104,6 @@ class _ScaffoldWithSidebarState extends State<ScaffoldWithSidebar> {
       color: Colors.grey.shade100,
       child: Column(
         children: [
-          Container(
-            height: 140,
-            color: Colors.blue,
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            alignment: Alignment.bottomLeft,
-            child: const Text('Writeak', style: TextStyle(color: Colors.white, fontSize: 20)),
-          ),
           Expanded(
             child: ListView.builder(
               itemCount: _items.length,
@@ -118,11 +137,6 @@ class _ScaffoldWithSidebarState extends State<ScaffoldWithSidebar> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            _items[_selectedIndex].label,
-            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
           Expanded(
             child: Card(
               child: Center(
